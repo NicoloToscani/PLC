@@ -31,8 +31,8 @@ public class Rung extends JPanel {
     private static final int LENGTH_BASE = 150;
     private static final int ACT_BORDER = 10;
     private boolean active;
+    private boolean hasOutput;
     private ArrayList<Actions> program;
-    
 
     public Rung(Dimension dimension) {
         this.setPreferredSize(new Dimension(750, 160));
@@ -49,72 +49,88 @@ public class Rung extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        int xlast = 0;
+        int xfirst = 0;
         Dimension panel = this.getSize();
+        int xlast = panel.width;
         Graphics2D g2 = (Graphics2D) g;
 
         g2.setStroke(new BasicStroke(3));
         g2.drawLine(LEFT_SPACE, TOP_SPACE, LEFT_SPACE, LENGTH_BASE);   //left base line
         g2.drawLine(panel.width - LEFT_SPACE, TOP_SPACE, panel.width - LEFT_SPACE, LENGTH_BASE);   //right base line
 
-        if(program.isEmpty()){
+        if (program.isEmpty()) {
             g2.drawLine(LEFT_SPACE, panel.height / 2 - 10, panel.width - 20, panel.height / 2 - 10);
+        }
+
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        for (int i = 0; i < program.size(); i++) {
+            switch (program.get(i)) {
+                case NOCONTACT:
+                    g2.drawString("--| |--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case NCCONTACT:
+                    g2.drawString("--|/|--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case RCONTACT:
+                    g2.drawString("--|R|--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case FCONTACT:
+                    g2.drawString("--|F|--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case NOCOIL:
+                    g2.drawString("--( )--", xlast - 70, panel.height / 2 - 4);
+                    xlast = panel.width - 50;
+                    break;
+                case NCCOIL:
+                    g2.drawString("--(/)--", xlast - 70, panel.height / 2 - 4);
+                    xlast = panel.width - 50;
+                    break;
+                case SCOIL:
+                    g2.drawString("--(S)--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case RCOIL:
+                    g2.drawString("--(R)--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+                case CMP:
+                    g2.drawString("--| < |--", xfirst + LEFT_SPACE, panel.height / 2 - 4);
+                    xfirst += 50;
+                    break;
+            }
         }
 
         if (active) {
             g2.setColor(Color.red);
-            g2.fillRect(xlast + LEFT_SPACE + ACT_BORDER, panel.height / 2 - 25, 30, 30);
+            g2.fillRect(xfirst + LEFT_SPACE + ACT_BORDER, panel.height / 2 - 25, 30, 30);
         }
-        
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        for (int i = 0; i < program.size(); i++) {
-            switch(program.get(i)){
-                case NOCONTACT:
-                    g2.drawString("--| |--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case NCCONTACT:
-                    g2.drawString("--|/|--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case RCONTACT:
-                    g2.drawString("--|R|--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case FCONTACT:
-                    g2.drawString("--|F|--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case NOCOIL:
-                    g2.drawString("--( )--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case NCCOIL:
-                    g2.drawString("--(/)--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case SCOIL:
-                    g2.drawString("--(S)--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case RCOIL:
-                    g2.drawString("--(R)--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-                case CMP:
-                    g2.drawString("--| < |--", xlast+LEFT_SPACE, panel.height / 2 - 4);
-                    break;
-            }
-            xlast += 50;
-        }
-        
-        g2.drawLine(xlast + LEFT_SPACE, panel.height / 2 - 10, panel.width - 20, panel.height / 2 - 10);
+
+        g2.drawLine(xfirst + LEFT_SPACE, panel.height / 2 - 10, xlast - 20, panel.height / 2 - 10);
     }
 
     public void setActive(boolean active) {
         this.active = active;
     }
-    
-    public void addAction(Actions a) throws Exception{
-        if(!program.add(a)){
+
+    public void addAction(Actions a) throws Exception {
+        if(a.equals(Actions.NCCOIL) || a.equals(Actions.NOCOIL)){
+            if(hasOutput){
+                return;
+            } else {
+                hasOutput = true;
+            }
+        }
+        if (!program.add(a)) {
             throw new Exception("Cannot add action.");
         }
         this.repaint();
     }
-    
-    public void print(String msg){
+
+    public void print(String msg) {
         System.out.println(msg);
     }
 }

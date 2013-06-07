@@ -4,6 +4,7 @@
  */
 package plc;
 
+import java.awt.Dimension;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -29,17 +30,33 @@ public class RungMouseListener implements MouseListener {
         if (!tm.isVisible()) {
             tm.setVisible(true);
             tm.setAlwaysOnTop(true);
+            tm.setLocationRelativeTo(((Rung) panel).note);
         }
+        tm.setLocationRelativeTo(((Rung) panel).note);
 
         if (BackgroundPanel.active != null) {
             BackgroundPanel.active.setActive(false);
             BackgroundPanel.active.repaint();
-        }
 
-        tm.setLocationRelativeTo(((Rung)panel).note);
-        ((Rung) panel).setActive(true);
-        ((Rung) panel).repaint();
-        BackgroundPanel.active = (Rung) panel;
+            if (BackgroundPanel.active.equals(panel)) {
+                ((Rung) panel).setActive(false);
+                ((Rung) panel).repaint();
+                tm.setVisible(false);
+                BackgroundPanel.active = null;
+            } else {
+                ((Rung) panel).setActive(true);
+                ((Rung) panel).repaint();
+                BackgroundPanel.active = (Rung) panel;
+            }
+
+        } else {
+            ((Rung) panel).setActive(true);
+            ((Rung) panel).repaint();
+            BackgroundPanel.active = (Rung) panel;
+        }
+        
+//        BackgroundPanel.active.setPreferredSize(new Dimension(750, 320));
+//        BackgroundPanel.active.revalidate();
     }
 
     @Override
